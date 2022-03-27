@@ -1,0 +1,93 @@
+//Variables that controls the circle:
+let posCircleX;
+let posCircleY;
+//Variables that changes the direction of the circle
+//True is up and right, false is left and down.
+let circleDirH = true;
+let circleDirV = true;
+//Saving the bat's position to make the collision stuff
+//more easy.
+let posBatX;
+let posBatY;
+
+function setup() 
+{
+  createCanvas(665, 400);
+  //To make the ball start on the center, just take
+  //the size of the window and divide it by 2.
+  posCircleX = 665/2;
+  posCircleY = 400/2;
+}
+
+function draw() 
+{
+  //Making the background a stylish blue.
+  background(60, 90, 132);
+  //Creating the ball and aplying the variables.
+  circle(posCircleX, posCircleY, 50);
+  //Creating the bat and making it follow the Mouse
+  //on the Y axis.
+  circle(posBatX, posBatY, 75);
+  posBatX = 50;
+  posBatY = mouseY - 25;
+  //And then just call the function and it will
+  //do their stuff.
+  circleMovement();
+  CollisionCircleWithBat();
+}
+
+//Aqui esta todo código para fazer a bola se mexer e quicar:
+function circleMovement()
+{
+  //Horizontal movement:
+  if(posCircleX > 640)
+    {
+      circleDirH = false;
+    }
+  else if(posCircleX < 25)
+    {
+      circleDirH = true;
+    }
+  
+  if(circleDirH == true)
+    {
+      posCircleX += 5;
+    }
+  else
+    {
+      posCircleX -= 5;
+    }
+  
+  //Vertical movement:
+  if(posCircleY > 375)
+    {
+      circleDirV = false;
+    }
+  else if(posCircleY < 25)
+    {
+      circleDirV = true;
+    }
+  
+  if(circleDirV == true)
+    {
+      posCircleY += 5;
+    }
+  else
+    {
+      posCircleY -= 5;
+    }
+}
+function CollisionCircleWithBat()
+{
+  //Calculating the distance between the circle and the bat.
+  let distanceX = posBatX - posCircleX;
+  let distanceY = posBatY - posCircleY;
+  let distance = sqrt((distanceX*distanceX) + (distanceY*distanceY));
+  
+  //If the distance is lower or equal to 75,
+  //make the ball go to the right.
+  if(distance <= 75)
+    {
+      circleDirH = true;
+    }
+}
