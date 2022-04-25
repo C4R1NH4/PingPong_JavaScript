@@ -36,7 +36,7 @@ function draw()
   CollisionCircleWithBat();
 }
 
-//Aqui esta todo código para fazer a bola se mexer e quicar:
+//The entire code that makes the ball move:
 function circleMovement()
 {
   //Horizontal movement:
