@@ -1,93 +1,110 @@
-//Variables that controls the circle:
-let posCircleX;
-let posCircleY;
-//Variables that changes the direction of the circle
-//True is up and right, false is left and down.
-let circleDirH = true;
-let circleDirV = true;
-//Saving the bat's position to make the collision stuff
-//more easy.
-let posBatX;
-let posBatY;
+//Tamanho da tela / Screen Size.
+let screenWidth = 625;
+let screenHeight = 400;
 
-function setup() 
-{
-  createCanvas(665, 400);
-  //To make the ball start on the center, just take
-  //the size of the window and divide it by 2.
-  posCircleX = 665/2;
-  posCircleY = 400/2;
+//Váriaveis da bolinha.
+let xBall = screenWidth / 2;
+let yBall = screenHeight / 2;
+let dBall = 25;
+let xVelBall = 6;
+let yVelBall = 6;
+let colidiuJogador = false;
+let colidiuInimigo = false;
+
+//Váriaveis da raquete do jogador.
+let xPlayer = 20;
+let yPlayer = screenHeight/2 - 50;
+let widthPlayer = 10;
+let heightPlayer = 100;
+let pointsPlayer = 0;
+
+//Váriaveis da raquete do inimigo.
+let xEnemy = screenWidth - 20;
+let yEnemy = screenHeight/2 - 50;
+let widhtEnemy = 10;
+let heightEnemy = 100;
+let pointsEnemy = 0;
+let yVelEnemy;
+
+function setup(){
+  createCanvas(screenWidth, screenHeight);
 }
 
-function draw() 
-{
-  //Making the background a stylish blue.
-  background(60, 90, 132);
-  //Creating the ball and aplying the variables.
-  circle(posCircleX, posCircleY, 50);
-  //Creating the bat and making it follow the Mouse
-  //on the Y axis.
-  circle(posBatX, posBatY, 75);
-  posBatX = 50;
-  posBatY = mouseY - 25;
-  //And then just call the function and it will
-  //do their stuff.
-  circleMovement();
-  CollisionCircleWithBat();
+function draw(){
+  background(30);
+  MoveBall();
+  DrawRacket(xPlayer, yPlayer, widthPlayer, heightPlayer);
+  DrawRacket(xEnemy, yEnemy, widhtEnemy, heightEnemy);
+  PlayerControl();
+  EnemyControl();
+  Collision();
+  Score();
 }
 
-//The entire code that makes the ball move:
-function circleMovement()
-{
-  //Horizontal movement:
-  if(posCircleX > 640)
-    {
-      circleDirH = false;
-    }
-  else if(posCircleX < 25)
-    {
-      circleDirH = true;
-    }
+function MoveBall(){
+  //Desenhando a bola e aumentando sua velocidade.
+  //Drawing the ball and increasing its speed.
+  circle(xBall, yBall, dBall);
+  xBall += xVelBall;
+  yBall += yVelBall;
   
-  if(circleDirH == true)
-    {
-      posCircleX += 5;
-    }
-  else
-    {
-      posCircleX -= 5;
-    }
-  
-  //Vertical movement:
-  if(posCircleY > 375)
-    {
-      circleDirV = false;
-    }
-  else if(posCircleY < 25)
-    {
-      circleDirV = true;
-    }
-  
-  if(circleDirV == true)
-    {
-      posCircleY += 5;
-    }
-  else
-    {
-      posCircleY -= 5;
-    }
+  //Fazendo a bola quicar caso saia muito longe.
+  //Making the ball bounce back in case it goes to far away.
+  if(xBall > screenWidth - dBall/2 || xBall < dBall/2){
+    xVelBall *= -1;
+  }
+  if(yBall > screenHeight - dBall/2 || yBall < dBall/2){
+    yVelBall *= -1;
+  }
 }
-function CollisionCircleWithBat()
-{
-  //Calculating the distance between the circle and the bat.
-  let distanceX = posBatX - posCircleX;
-  let distanceY = posBatY - posCircleY;
-  let distance = sqrt((distanceX*distanceX) + (distanceY*distanceY));
+
+function DrawRacket(posX, posY, comp, alt){
+  //Desenhando a raquete usando as variáveis listada.
+  //Drawing the racket using variables.
+  rect(posX, posY, comp, alt);
+}
+
+function PlayerControl(){
+  //Movimentação simples usando setas.
+  //Simple movement utilizing arrow keys.
+  if(keyIsDown(UP_ARROW) && yPlayer > 0){
+    yPlayer -= 5;
+  }
+  if(keyIsDown(DOWN_ARROW) && yPlayer < 300){
+    yPlayer += 5;
+  }
+}
+
+function EnemyControl(){
+  yVelEnemy = yBall - yEnemy - heightEnemy / 2;
+  yEnemy += yVelEnemy;
+}
+
+function Collision(){
+  //Para fazer a colisão, estarei utilizando a biblioteca
+  //p5.collide2D por Ben Moren.
+  //Collision using Ben Moren's p5.collide2D library.
+  collidePlayer = collideRectCircle(xPlayer, yPlayer, widthPlayer, heightPlayer, xBall, yBall, dBall);
+  collideEnemy = collideRectCircle(xEnemy, yEnemy, widhtEnemy, heightEnemy, xBall, yBall, dBall);
   
-  //If the distance is lower or equal to 75,
-  //make the ball go to the right.
-  if(distance <= 75)
-    {
-      circleDirH = true;
-    }
+  if(collidePlayer == true){
+    xVelBall *= -1;
+    pointsPlayer += 1;
+  }
+  if(collideEnemy == true){
+    xVelBall *= -1;
+    pointsEnemy += 1;
+  }
+}
+
+function Score(){
+  //Só colocando um textinho e alterando sua cor.
+  //Placing some text on top of the screen.
+  text(pointsPlayer, screenWidth/2 - 50, 50);
+  fill(255);
+  
+  rect(screenWidth / 2, 20, 7.5, 50)
+  
+  text(pointsEnemy, screenWidth/2 + 50, 50);
+  fill(255);
 }
